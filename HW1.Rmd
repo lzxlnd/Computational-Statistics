@@ -1,0 +1,53 @@
+---
+title: "HW1"
+author: Xinjun Li
+date: 2018/3/6
+output: html_document
+---
+
+##Q1: Calculate t-statistic.
+
+```{r Q1}
+
+twosam<-function(y1,y2){
+  n1<-length(y1);n2<-length(y2)
+  yb1<-mean(y1);yb2<-mean(y2)
+  s1<-var(y1);s2<-var(y2)
+  s<-((n1-1)*s1+(n2-1)*s2)/(n1+n2-2)
+  tst<-(yb1-yb2)/sqrt(s*(1/n1+1/n2))
+  tst
+}
+
+A<-c(79.98,80.04,80.02,80.04,80.03,80.03,80.04,79.97,80.05,80.03,80.02,80,80.02)
+B<-c(80.02,79.94,79.98,79.97,80.03,79.95,79.97)
+
+twosam(A,B)
+
+```
+
+
+##Q2: Integration.
+
+```{r Q2}
+
+area<-function(f,a,b,eps=1.0e-06,lim=10){
+  fun1<-function(f,a,b,fa,fb,a0,eps,lim,fun){
+    d<-(a+b/2);h<-(b-a)/4;fd<-f(d)
+    a1<-h*(fa+fd);a2<-h*(fd+fb)
+    if(abs(a0-a1-a2)<eps || lim==0)
+      return(a1+a2)
+    else{
+      return(fun(f,a,d,fa,fd,a1,eps,lim-1,fun)
+      +fun(f,d,b,fd,fb,a2,eps,lim-1,fun))
+    }
+  }
+  fa<-f(a);fb<-f(b)
+  a0<-(fa+fb)*(b-a)/2
+  fun1(f,a,b,fa,fb,a0,eps,lim,fun1)
+}
+f<-function(x) 1/x
+quad<-area(f,1,5)
+quad
+
+```
+
