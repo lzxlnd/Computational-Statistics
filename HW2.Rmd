@@ -1,0 +1,105 @@
+---
+title: "HW2"
+author: Xinjun Li
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r}
+
+library(ggplot2)
+
+
+```
+
+
+
+```{r Kolmogorov-Smirnov statistic}
+
+##calculate D
+
+D<-function(x,y){       #x: observations, y: distribution
+  n<-length(x)
+  m<-length(y)
+  f<-replicate(n,0)
+  
+  sx<-sort(x)
+  sy<-sort(y)
+  
+  for (i in 1:n) {
+    f[i]<-abs(as.numeric( i/n-rank(c(x[i],sy))[1]/(m+1))) #calculate difference of p
+    
+    ##the following may be wrong for it calculate the difference of quantile
+    #f[i]<-abs(as.numeric(quantile(x,probs = (i-1)/(n-1))-quantile(y,probs = (i-1)/(n-1))))
+  }
+  max(f)
+}
+
+```
+
+
+```{r K-S test}
+##KS-TEST
+
+MC.KS<-function(x,y,times,size=100,probs =.05,plot=FALSE){       #y is a vector, size: sample size, times: sample times
+  dis<-replicate(times,D(sample(y,size,replace = TRUE),y)) 
+  # sample to generate distribution of D
+  
+  p.val<-length(dis[dis>=D(x,y)])/times 
+  #calculate p-value using estimate distribution
+  
+  cat(c("D=",D(x,y),"\n"))   #print outcome
+  if(p.val>=probs){
+    cat("they are from the same distribution.\n")
+    cat(t(data.frame(c("p-value =",p.val,"\n"))))
+  }
+  else{
+    cat("they are NOT from the same distribution.\n")
+    cat(t(data.frame("p-value =",p.val,"\n")))
+  }
+  if(plot){
+    ggplot(data.frame(dis),aes(x=dis))+geom_histogram(bins = 20)
+  }
+}
+
+```
+
+##Do K-S test on real data
+
+```{r K-S test in real data}
+
+
+precip <- c(0.020, 0.001, 0.001, 0.120, 0.080, 0.420, 1.720, 0.050, 0.010, 0.010,0.003,0.001,0.003, 0.270, 0.001, 0.060, 0.050, 2.130, 0.040, 1.100, 0.020, 0.001,0.140, 0.080, 0.210, 0.070, 0.320, 0.240, 0.290, 0.001, 0.290, 1.130, 0.003,
+0.010, 0.190, 0.002, 0.010, 0.040, 0.002,0.070, 0.450, 0.010, 0.180, 0.670, 0.003, 0.010, 0.040, 0.002, 0.490, 0.020, 0.020, 0.340, 0.140, 0.370, 0.330,
+0.330, 0.350, 0.010, 0.500, 0.760, 1.060, 0.002 ,0.060, 0.160 ,0.270, 0.250,
+0.290, 0.020, 0.050, 0.460, 0.070, 0.410, 0.020, 0.080, 0.210, 0.010, 0.440,
+0.020, 0.050 ,0.110, 1.500, 0.003, 0.180 ,0.010, 0.002, 0.240, 0.010, 0.750,
+0.010, 0.140 ,0.130, 0.010, 0.010 ,0.270, 0.450, 1.780, 0.250, 0.240, 0.004,
+0.210, 0.170, 0.830, 0.150, 0.030, 0.030, 0.500 ,0.040, 0.090 ,0.040 ,0.060,
+0.060, 0.120, 0.003, 0.003, 0.400, 0.020, 0.510, 0.003, 0.020, 0.020, 0.020,
+0.010, 0.001, 0.140, 0.001, 0.100, 0.010 ,1.090 ,0.010, 0.002, 0.001, 0.840,
+0.030, 0.350, 0.070, 0.001, 0.002, 0.002, 0.200, 0.060, 0.140, 0.010, 0.020,
+0.020, 0.002, 0.001, 0.550, 0.130, 0.190, 2.100, 0.090, 0.350, 0.790, 0.320,
+1.350,0.170,0.020,0.002, 0.010,0.250,0.230,0.170,0.010,0.020,0.001,
+0.010,0.020,0.110,0.210,1.260,0.010,0.730,0.100,0.090,0.007, 0.360,
+0.770,0.210,1.270,0.070,0.080,0.160,0.260,0.010,0.230,0.080,0.020,
+0.010,0.290,0.010,0.010,0.070,0.400,0.002, 0.003, 0.010,0.090,0.160,
+0.040,0.270,0.730,0.410,0.030,0.120,0.030,1.040,0.060,0.090,0.730,
+0.040,0.160,0.590,0.003, 0.002, 0.020,0.004, 0.010,0.001, 0.060,0.620,
+0.010,0.520,0.110,0.003, 0.600,0.002, 0.050)
+
+
+MC.KS(precip,qgamma(seq(length(precip))/(1+length(precip)),.377,1.684),100,size = 100 ,plot = TRUE)
+ks.test(precip,qgamma(seq(length(precip))/(1+length(precip)),.377,1.684))
+
+
+
+```
+
+
+
+
+
+
