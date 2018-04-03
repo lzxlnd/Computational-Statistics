@@ -6,8 +6,11 @@ output:
     df_print: paged
 ---
 
+## Using Monte Carlo method to do Kolmogorov-Smirnov test
 
 ```{r}
+
+#package set-up
 
 library(ggplot2)
 
@@ -15,8 +18,9 @@ library(ggplot2)
 ```
 
 
+Write a function to calculate K-S statistics(D) first.
 
-```{r Kolmogorov-Smirnov statistic}
+```{r Kolmogorov-Smirnov statistics}
 
 ##calculate D
 
@@ -93,9 +97,20 @@ precip <- c(0.020, 0.001, 0.001, 0.120, 0.080, 0.420, 1.720, 0.050, 0.010, 0.010
 0.040,0.160,0.590,0.003, 0.002, 0.020,0.004, 0.010,0.001, 0.060,0.620,
 0.010,0.520,0.110,0.003, 0.600,0.002, 0.050)
 
+q<-qgamma(seq(length(precip))/(1+length(precip)),.377,1.684)
 
-MC.KS(precip,qgamma(seq(length(precip))/(1+length(precip)),.377,1.684),100,size = 100 ,plot = TRUE)
-ks.test(precip,qgamma(seq(length(precip))/(1+length(precip)),.377,1.684))
+MC.KS(precip,q,100,size = 100 ,plot = TRUE)
+ks.test(precip,q)
+
+##view the empirical cdf for two distributions
+
+
+df<-data.frame(
+  x<-c(precip,q),
+  g<-gl(2,length(precip),labels = c("precip","gamma"))
+)
+
+ggplot(df,aes(x,colour=g))+stat_ecdf(pad = FALSE)
 
 
 
