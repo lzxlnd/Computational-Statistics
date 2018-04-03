@@ -3,7 +3,7 @@ title: "Homework 3"
 output:
   html_document:
     df_print: paged
-auther: Xinjun Li
+author: Xinjun Li
 ---
 
 #EM algorithm
