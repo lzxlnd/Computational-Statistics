@@ -1,0 +1,66 @@
+---
+title: "Homework 3"
+output:
+  html_document:
+    df_print: paged
+auther: Xinjun Li
+---
+
+#EM algorithm
+
+```{r packages, include=FALSE}
+library(ggplot2)
+
+```
+
+###DATA
+```{r generate data}
+set.seed(10)
+m=500;n=5;t=.5
+real_theta=3
+y<-rexp(n,real_theta)
+z<-rexp(m,real_theta)
+r<-as.numeric(length(z[z<=t]))    #calculate r
+r
+
+```
+
+
+##EM
+
+```{r using EM, warning=FALSE}
+
+k=1000           #迭代次数上限
+theta<-1/mean(y) #设置theta_0的值(using mle of y)
+e<-.1^8           #设置精度
+
+cat(c("theta_0 =",theta,"\n"))
+
+for(i in 1:k){
+  h=exp(-theta[i]*t)/(1-exp(-theta[i]*t))
+  x<-(m+n)/(sum(y)+(m-r)*(t+1/theta[i])+r*(1/theta[i]-t*h))
+  theta<-c(theta,x)
+  if((x-theta[i])^2<e^2)
+    break
+}
+
+length(theta)       #查看迭代次数
+
+tail(theta,n=1L)    #查看估计的theta
+
+```
+
+```{r eval=FALSE, include=FALSE}
+theta
+
+th<-function(x){
+  h=exp(-x*t)/(1-exp(-x*t))
+  x-(m+n)/(sum(y)+(m-r)*(t+1/x)+r*(1/x-t*h))
+}
+
+p <- ggplot(data.frame(x=c(0,5)), aes(x=x))
+p + stat_function(fun = th,colour="red")+geom_hline(yintercept = 0)
+
+```
+
+
